@@ -3,14 +3,14 @@ package DS;
 import java.security.InvalidParameterException;
 import java.util.Iterator;
 
-public class SinglyLinkedList implements Iterable<Integer>{
+public class SinglyLinkedList<T> implements Iterable<T>{
     
-    public Node head;
+    public Node<T> head;
 
-    private static class Node {
+    private static class Node<T> {
 
-        private int data; 
-        private Node next = null;
+        private T data; 
+        private Node<T> next = null;
 
         @Override
         public String toString () {
@@ -19,14 +19,14 @@ public class SinglyLinkedList implements Iterable<Integer>{
     
         }
 
-        public Node(int data) {
+        public Node(T data) {
             
             this.data = data;
             this.next = null;
         
         }
 
-        public Node(int data, Node next) {
+        public Node(T data, Node<T> next) {
             
             this.data = data;
             this.next = next;
@@ -36,11 +36,11 @@ public class SinglyLinkedList implements Iterable<Integer>{
     }
 
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<T> iterator() {
         
-        return new Iterator<Integer>() {
+        return new Iterator<T>() {
             
-            private Node n = head; 
+            private Node<T> n = head;
 
             @Override
             public boolean hasNext() {
@@ -50,9 +50,9 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
 
             @Override
-            public Integer next() {
+            public T next() {
 
-                Integer data = n.data;
+                T data = n.data;
                 n = n.next;
                 
                 return data;
@@ -79,24 +79,8 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         sb.append("[");
 
-        // Node n = head;
-
-        // while(n != null) {
-
-        //     sb.append(n.data);
-
-        //     if (n.next != null) {
-
-        //         sb.append(", ");
-
-        //     }
-
-        //     n = n.next;
-
-        // }
-
         //use iterator
-        Iterator<Integer> itr = this.iterator();
+        Iterator<T> itr = this.iterator();
 
         while(itr.hasNext()) {
             
@@ -116,40 +100,60 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
     }
 
-    public Node getHead() {
+    public Node<T> getHead() {
 
         return head;
 
     }
 
-    private SinglyLinkedList setHead(Node n) {
+    private SinglyLinkedList<T> setHead(Node<T> n) {
 
         head = n;
         return this;
 
     }
     
-    private Node getNode(int data) {
+    private Node<T> getNode(T data) {
 
-        return new Node(data);
+        return new Node<T>(data);
 
     }
 
-    public static boolean isEmpty(SinglyLinkedList list) {
+    public boolean isEmpty(SinglyLinkedList<T> list) {
 
         return list.getHead() == null;
 
     }
 
-    public SinglyLinkedList reset() {
+    public SinglyLinkedList<T> reset() {
         
-        head = null;
+        if (!isEmpty(this)) {
+
+            Node<T> curNode = getHead();
+            Node<T> temp = null;
+
+            while (curNode != null) {
+
+                temp = curNode;
+                curNode = curNode.next;
+
+                System.out.println("Deleting " + temp.data);
+
+                //let the prev node be garbage collected
+                temp.next = null;
+                temp = null;
+
+            }
+
+            head = null;
+
+        }
 
         return this;
 
     }
     
-    public SinglyLinkedList addToEmptyList(int data) {
+    public SinglyLinkedList<T> addToEmptyList(T data) {
 
         if (head != null) {
 
@@ -157,17 +161,17 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         }
         
-        Node n = getNode(data);
+        Node<T> n = getNode(data);
         setHead(n);
 
         return this;
 
     }
 
-    public SinglyLinkedList add(int data) {
+    public SinglyLinkedList<T> add(T data) {
         
-        Node n = new Node(data);
-        Node currNode = getHead();
+        Node<T> n = new Node<>(data);
+        Node<T> currNode = getHead();
 
         if (head == null) {
             
@@ -186,7 +190,7 @@ public class SinglyLinkedList implements Iterable<Integer>{
         return this;
     }
 
-    public SinglyLinkedList add(int data, int pos) {
+    public SinglyLinkedList<T> add(T data, int pos) {
         
         if (pos < 0) {
 
@@ -206,8 +210,8 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         }
 
-        Node currNode = getHead();
-        Node prevNode = null;
+        Node<T> currNode = getHead();
+        Node<T> prevNode = null;
 
         int counter = 0;
 
@@ -225,7 +229,7 @@ public class SinglyLinkedList implements Iterable<Integer>{
             throw new InvalidParameterException("Position doesn't yet exist for the target list.");
         }
 
-        Node n = getNode(data);
+        Node<T> n = getNode(data);
         
         if(prevNode == null) {
             setHead(n);
@@ -239,7 +243,7 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
     }
 
-    public SinglyLinkedList deleteAtPos(int pos) {
+    public SinglyLinkedList<T> deleteAtPos(int pos) {
 
         if (pos < 0) {
 
@@ -255,8 +259,8 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         int counter = 0;
 
-        Node curNode = getHead();
-        Node prevNode = null;
+        Node<T> curNode = getHead();
+        Node<T> prevNode = null;
 
         while (counter != pos && curNode.next != null) {
 
@@ -292,7 +296,7 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
     }
 
-    public int search(int data) {
+    public int search(T target) {
 
         if (isEmpty(this)) {
             
@@ -302,13 +306,13 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         int pos = 0;
 
-        Iterator<Integer> itr = this.iterator();
+        Iterator<T> itr = this.iterator();
 
         while (itr.hasNext()) { 
             
-            int item = itr.next();
+            T item = itr.next();
 
-            if (item == data) {
+            if (item == target) {
 
                 return pos;
 
@@ -322,7 +326,7 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
     }
 
-    public boolean has (int target) {
+    public boolean has (T target) {
 
         if (isEmpty(this)) {
             
@@ -330,11 +334,11 @@ public class SinglyLinkedList implements Iterable<Integer>{
 
         }
         
-        Iterator<Integer> itr = this.iterator();
+        Iterator<T> itr = this.iterator();
 
         while(itr.hasNext()) {
 
-            int data = itr.next();
+            T data = itr.next();
             
             if (data == target) {
 
